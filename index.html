@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>財務儀表板</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Noto+Serif+TC:wght@300;400;500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0f0f0e;
+  --paper: #f5f2ec;
+  --paper2: #ede9e1;
+  --accent: #c8512a;
+  --accent2: #2a6bc8;
+  --gold: #b89a4a;
+  --green: #2a7a4b;
+  --red: #c8512a;
+  --muted: #8a8680;
+  --border: #d4cfc6;
+  --card: #faf8f4;
+  --shadow: 0 1px 3px rgba(15,15,14,0.08), 0 4px 16px rgba(15,15,14,0.04);
+  --radius: 3px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+.site-header {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.site-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+.site-title span { color: var(--gold); }
+
+/* ── NAV ── */
+nav {
+  display: flex;
+  gap: 2px;
+}
+.nav-btn {
+  background: none;
+  border: none;
+  color: #888;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: var(--radius);
+  transition: all 0.15s;
+}
+.nav-btn:hover { color: var(--paper); background: rgba(255,255,255,0.08); }
+.nav-btn.active { color: var(--paper); background: rgba(255,255,255,0.14); }
+
+/* ── MAIN ── */
+.main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── STATUS BAR ── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.status-bar h1 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 22px;
+  font-weight: 500;
+}
+.status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; } 50% { opacity:0.4; }
+}
+.status-text { color: var(--muted); font-size: 12px; font-family: 'DM Mono', monospace; }
+.last-update { color: var(--muted); font-size: 11px; font-family: 'DM Mono', monospace; margin-left: auto; }
+
+/* ── CARDS ── */
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+.card-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.card-value {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.card-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-family: 'DM Mono', monospace;
+}
+.card-value.positive { color: var(--green); }
+.card-value.negative { color: var(--red); }
+.card-value.gold { color: var(--gold); }
+
+/* ── SECTION ── */
+.section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.section-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--paper2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.section-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.section-body { padding: 20px; }
+
+/* ── TABLE ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.data-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: right;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.data-table th:first-child { text-align: left; }
+.data-table td {
+  padding: 9px 10px;
+  text-align: right;
+  border-bottom: 1px solid rgba(212,207,198,0.4);
+  font-feature-settings: 'tnum';
+}
+.data-table td:first-child { text-align: left; font-weight: 500; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: rgba(200,81,42,0.03); }
+
+.group-header td {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--paper2) !important;
+  padding: 8px 10px;
+  font-weight: 600;
+}
+.total-row td {
+  font-weight: 600;
+  background: var(--paper2);
+  border-top: 1px solid var(--border);
+}
+
+.pos { color: var(--green); }
+.neg { color: var(--red); }
+.muted { color: var(--muted); }
+
+/* ── MONTH SELECTOR ── */
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.ctrl-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+.ctrl-select, .ctrl-input {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--ink);
+  cursor: pointer;
+  outline: none;
+}
+.ctrl-select:focus, .ctrl-input:focus { border-color: var(--accent); }
+.ctrl-btn {
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: var(--radius);
+  padding: 7px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.ctrl-btn:hover { opacity: 0.8; }
+
+/* ── CHART ── */
+.chart-wrap { position: relative; height: 200px; overflow: hidden; }
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 100%;
+  padding: 8px 0 24px;
+}
+.bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  height: 100%;
+  justify-content: flex-end;
+}
+.bar-pair {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 40px;
+  height: calc(100% - 20px);
+}
+.bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  transition: opacity 0.2s;
+  min-height: 2px;
+}
+.bar:hover { opacity: 0.8; }
+.bar.income { background: var(--green); }
+.bar.expense { background: var(--red); }
+.bar-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 4px;
+  white-space: nowrap;
+}
+
+/* ── LOADING ── */
+.loading {
+  text-align: center;
+  padding: 48px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+.loading::before { content: '↻ '; animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg {
+  background: #fff5f3;
+  border: 1px solid #fcd5ca;
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  color: var(--red);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  margin: 16px 0;
+}
+
+/* ── TREND LINE ── */
+.sparkline { height: 60px; }
+
+/* ── TAG ── */
+.tag {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  background: var(--paper2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.tag.link {
+  color: var(--accent2);
+  border-color: #c5d8f5;
+  background: #f0f5fe;
+  cursor: pointer;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .site-header { padding: 0 16px; }
+  .main { padding: 20px 14px; }
+  .cards-row { grid-template-columns: 1fr 1fr; }
+  .nav-btn { padding: 8px 10px; font-size: 10px; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-title">個人財務<span> · </span>Dashboard</div>
+  <nav>
+    <button class="nav-btn active" onclick="showPage('overview')">總覽</button>
+    <button class="nav-btn" onclick="showPage('assets')">資產</button>
+    <button class="nav-btn" onclick="showPage('stocks')">股票</button>
+    <button class="nav-btn" onclick="showPage('reconcile')">對帳</button>
+  </nav>
+</header>
+
+<main class="main">
+
+<!-- ══════════════════════════════
+     PAGE 1: 月報總覽
+═══════════════════════════════ -->
+<div id="page-overview" class="page active">
+  <div class="status-bar">
+    <h1>月報總覽</h1>
+    <div class="status-dot"></div>
+    <span class="status-text" id="overview-status">載入中...</span>
+    <span class="last-update" id="overview-update"></span>
+  </div>
+
+  <div class="controls">
+    <span class="ctrl-label">查看月份</span>
+    <select class="ctrl-select" id="overview-month" onchange="loadOverview()"></select>
+  </div>
+
+  <div class="cards-row" id="overview-cards">
+    <div class="loading">讀取資料...</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">收支趨勢 — 近 6 個月</span>
+    </div>
+    <div class="section-body">
+      <div class="chart-wrap" id="overview-chart">
+        <div class="loading">讀取圖表資料...</div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;">
+        <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;display:flex;align-items:center;gap:5px;">
+          <span style="width:10px;height:10px;background:var(--green);border-radius:2px;display:inline-block;"></span>收入
+        </span>
+        <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;display:flex;align-items:center;gap:5px;">
+          <span style="width:10px;height:10px;background:var(--red);border-radius:2px;display:inline-block;"></span>支出
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">當月支出分類</span>
+    </div>
+    <div class="section-body" id="overview-cats">
+      <div class="loading">讀取分類...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 2: 資產負債
+═══════════════════════════════ -->
+<div id="page-assets" class="page">
+  <div class="status-bar">
+    <h1>資產負債</h1>
+    <div class="status-dot"></div>
+    <span class="status-text" id="assets-status">載入中...</span>
+    <span class="last-update" id="assets-update"></span>
+  </div>
+
+  <div class="cards-row" id="assets-cards">
+    <div class="loading">讀取資料...</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">資產負債表</span>
+    </div>
+    <div class="section-body" id="assets-table">
+      <div class="loading">讀取資料...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 3: 股票持倉
+═══════════════════════════════ -->
+<div id="page-stocks" class="page">
+  <div class="status-bar">
+    <h1>股票持倉</h1>
+    <div class="status-dot"></div>
+    <span class="status-text" id="stocks-status">載入中...</span>
+    <span class="last-update" id="stocks-update"></span>
+  </div>
+
+  <div class="cards-row" id="stocks-cards">
+    <div class="loading">讀取資料...</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><span class="section-title">台股持倉明細</span></div>
+    <div class="section-body" id="tw-stocks-table">
+      <div class="loading">讀取台股資料...</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><span class="section-title">美股持倉明細</span></div>
+    <div class="section-body" id="us-stocks-table">
+      <div class="loading">讀取美股資料...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE 4: 帳戶對帳
+═══════════════════════════════ -->
+<div id="page-reconcile" class="page">
+  <div class="status-bar">
+    <h1>帳戶對帳</h1>
+    <div class="status-dot"></div>
+    <span class="status-text" id="recon-status">載入中...</span>
+    <span class="last-update" id="recon-update"></span>
+  </div>
+
+  <div class="controls">
+    <span class="ctrl-label">月份</span>
+    <select class="ctrl-select" id="recon-month" onchange="loadReconcile()"></select>
+    <span class="ctrl-label" style="margin-left:12px;">信用卡自訂範圍</span>
+    <input type="date" class="ctrl-input" id="recon-date-from">
+    <span class="ctrl-label">至</span>
+    <input type="date" class="ctrl-input" id="recon-date-to">
+    <button class="ctrl-btn" onclick="loadReconcile()">查詢</button>
+  </div>
+
+  <div id="recon-table">
+    <div class="loading">讀取對帳資料...</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// 設定區 — 修改這裡
+// ══════════════════════════════════════════════════════════
+const CONFIG = {
+  // 流水帳試算表
+  LEDGER_ID: '15W_VmGeycCLImrlmKpVehPI8WCGbkB8ugaDgtYqTVeQ',
+  LEDGER_SHEET: '📒流水帳_個人',
+  RECON_SHEET: '🔄 帳戶對帳',
+
+  // 資產負債試算表
+  ASSET_ID: '1kNVgoZtb-GBazMwoiXDy5e_I6CZhw65UyZKIOLgpTAI',
+  ASSET_SHEET: '2026資產負債',
+  TREND_SHEET: '資產負債表趨勢',
+  TW_STOCK_SHEET: '台股交易紀錄',
+  US_STOCK_SHEET: '美股交易紀錄',
+};
+
+const ACCOUNTS_BANK = ['中信帳戶','永豐帳戶','台新帳戶','台銀','現金','Line Money','iPass Money'];
+const ACCOUNTS_CREDIT = ['中信信用卡','永豐信用卡','台新信用卡'];
+
+// ══════════════════════════════════════════════════════════
+// 工具函式
+// ══════════════════════════════════════════════════════════
+const fmt = (n, digits=0) => {
+  if (n === null || n === undefined || n === '' || isNaN(n)) return '—';
+  return Number(n).toLocaleString('zh-TW', { maximumFractionDigits: digits, minimumFractionDigits: digits });
+};
+const fmtPct = (n) => {
+  if (!n && n !== 0) return '—';
+  const pct = (Number(n) * 100).toFixed(1);
+  return (n >= 0 ? '+' : '') + pct + '%';
+};
+const colorClass = (n) => {
+  if (!n || isNaN(n)) return '';
+  return Number(n) >= 0 ? 'pos' : 'neg';
+};
+
+async function fetchSheet(spreadsheetId, sheetName) {
+  const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`無法讀取工作表：${sheetName}`);
+  const text = await res.text();
+  // 去掉 Google 的包裝
+  const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+  return json.table;
+}
+
+function tableToRows(table) {
+  if (!table || !table.rows) return [];
+  return table.rows.map(row =>
+    (table.cols || []).map((col, i) => {
+      const cell = row.c && row.c[i];
+      if (!cell) return null;
+      return cell.v !== undefined ? cell.v : null;
+    })
+  );
+}
+
+function getColHeaders(table) {
+  if (!table || !table.cols) return [];
+  return table.cols.map(c => c.label || '');
+}
+
+// 月份選單初始化
+function initMonthSelectors() {
+  const now = new Date();
+  const months = [];
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label = `${d.getFullYear()}年 ${d.getMonth()+1}月`;
+    months.push({ val, label });
+  }
+  ['overview-month','recon-month'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = months.map((m,i) =>
+      `<option value="${m.val}"${i===0?' selected':''}>${m.label}</option>`
+    ).join('');
+  });
+  // 對帳日期預設為當月
+  const y = now.getFullYear(), mo = now.getMonth()+1;
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('recon-date-from').value = `${y}-${pad(mo)}-01`;
+  const lastDay = new Date(y, mo, 0).getDate();
+  document.getElementById('recon-date-to').value = `${y}-${pad(mo)}-${lastDay}`;
+}
+
+// 頁面切換
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  event.target.classList.add('active');
+  // lazy load
+  if (name === 'overview' && !window._overviewLoaded) loadOverview();
+  if (name === 'assets' && !window._assetsLoaded) loadAssets();
+  if (name === 'stocks' && !window._stocksLoaded) loadStocks();
+  if (name === 'reconcile' && !window._reconLoaded) loadReconcile();
+}
+
+// ══════════════════════════════════════════════════════════
+// PAGE 1: 月報總覽
+// ══════════════════════════════════════════════════════════
+async function loadOverview() {
+  window._overviewLoaded = false;
+  const month = document.getElementById('overview-month').value;
+  document.getElementById('overview-status').textContent = `${month}`;
+  document.getElementById('overview-cards').innerHTML = '<div class="loading">讀取資料...</div>';
+  document.getElementById('overview-chart').innerHTML = '<div class="loading">讀取圖表...</div>';
+  document.getElementById('overview-cats').innerHTML = '<div class="loading">讀取分類...</div>';
+
+  try {
+    const table = await fetchSheet(CONFIG.LEDGER_ID, CONFIG.LEDGER_SHEET);
+    const rows = tableToRows(table);
+    const headers = getColHeaders(table);
+
+    // 欄位索引（根據實際 Google Sheets 結構）
+    // A日期(0) B類型(1) C帳戶來源(2) D目標帳戶(3) E金額(4) F幣別(5) G交易匯率(6) H台幣換算(7) I主類(8) J子類(9) K備註(10) L對帳狀態(11) M年月(12)
+    const iYM = 12, iType = 1, iTWD = 7, iMain = 8;
+
+    const monthRows = rows.filter(r => r[iYM] && String(r[iYM]).startsWith(month));
+    const incomeRows = monthRows.filter(r => r[iType] === '收入');
+    const expenseRows = monthRows.filter(r => r[iType] === '支出');
+
+    const totalIncome = incomeRows.reduce((s,r) => s + (Number(r[iTWD])||0), 0);
+    const totalExpense = expenseRows.reduce((s,r) => s + (Number(r[iTWD])||0), 0);
+    const net = totalIncome - totalExpense;
+    const txCount = monthRows.filter(r => r[iType] !== '移轉').length;
+
+    document.getElementById('overview-cards').innerHTML = `
+      <div class="card">
+        <div class="card-label">本月收入</div>
+        <div class="card-value positive">$${fmt(totalIncome)}</div>
+        <div class="card-sub">${incomeRows.length} 筆</div>
+      </div>
+      <div class="card">
+        <div class="card-label">本月支出</div>
+        <div class="card-value negative">$${fmt(totalExpense)}</div>
+        <div class="card-sub">${expenseRows.length} 筆</div>
+      </div>
+      <div class="card">
+        <div class="card-label">本月結餘</div>
+        <div class="card-value ${colorClass(net)}">$${fmt(net)}</div>
+        <div class="card-sub">共 ${txCount} 筆交易</div>
+      </div>
+      <div class="card">
+        <div class="card-label">儲蓄率</div>
+        <div class="card-value ${net>=0?'positive':'negative'}">${totalIncome>0?((net/totalIncome)*100).toFixed(1):0}%</div>
+        <div class="card-sub">${net>=0?'目標達成':'本月透支'}</div>
+      </div>
+    `;
+
+    // 趨勢圖（近6個月）
+    const now = new Date();
+    const recentMonths = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+      recentMonths.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+    }
+    const monthlyData = recentMonths.map(m => {
+      const mRows = rows.filter(r => r[iYM] && String(r[iYM]).startsWith(m));
+      const inc = mRows.filter(r=>r[iType]==='收入').reduce((s,r)=>s+(Number(r[iTWD])||0),0);
+      const exp = mRows.filter(r=>r[iType]==='支出').reduce((s,r)=>s+(Number(r[iTWD])||0),0);
+      return { month: m.slice(5), income: inc, expense: exp };
+    });
+    const maxVal = Math.max(...monthlyData.flatMap(d=>[d.income, d.expense]), 1);
+    document.getElementById('overview-chart').innerHTML = `
+      <div class="bar-chart">
+        ${monthlyData.map(d => `
+          <div class="bar-group">
+            <div class="bar-pair">
+              <div class="bar income" style="height:${(d.income/maxVal*100).toFixed(1)}%" title="收入 $${fmt(d.income)}"></div>
+              <div class="bar expense" style="height:${(d.expense/maxVal*100).toFixed(1)}%" title="支出 $${fmt(d.expense)}"></div>
+            </div>
+            <div class="bar-label">${d.month}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    // 分類支出
+    const catMap = {};
+    expenseRows.forEach(r => {
+      const cat = r[iMain] || '其他';
+      catMap[cat] = (catMap[cat]||0) + (Number(r[iTWD])||0);
+    });
+    const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+    const catMax = cats[0]?.[1] || 1;
+    document.getElementById('overview-cats').innerHTML = cats.length ? `
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${cats.map(([cat,amt])=>`
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:80px;font-size:12px;flex-shrink:0;">${cat}</div>
+            <div style="flex:1;background:var(--paper2);border-radius:2px;height:8px;overflow:hidden;">
+              <div style="height:100%;background:var(--accent);border-radius:2px;width:${(amt/catMax*100).toFixed(1)}%;opacity:0.75;"></div>
+            </div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-align:right;width:80px;">$${fmt(amt)}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);width:40px;text-align:right;">${((amt/totalExpense)*100).toFixed(0)}%</div>
+          </div>
+        `).join('')}
+      </div>
+    ` : '<div class="muted" style="font-size:13px;">本月無支出記錄</div>';
+
+    document.getElementById('overview-update').textContent = `更新於 ${new Date().toLocaleTimeString('zh-TW')}`;
+    document.getElementById('overview-status').textContent = month;
+    window._overviewLoaded = true;
+  } catch(e) {
+    document.getElementById('overview-cards').innerHTML = `<div class="error-msg">讀取失敗：${e.message}<br><br>請確認 Google Sheets 已設為「知道連結的任何人可以檢視」</div>`;
+    console.error(e);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// PAGE 2: 資產負債
+// ══════════════════════════════════════════════════════════
+async function loadAssets() {
+  window._assetsLoaded = false;
+  document.getElementById('assets-status').textContent = '載入中...';
+  document.getElementById('assets-cards').innerHTML = '<div class="loading">讀取資料...</div>';
+  document.getElementById('assets-table').innerHTML = '<div class="loading">讀取資料...</div>';
+
+  try {
+    const table = await fetchSheet(CONFIG.ASSET_ID, CONFIG.ASSET_SHEET);
+    const rows = tableToRows(table);
+    const headers = getColHeaders(table);
+
+    // 嘗試讀取資產負債表結構
+    // 假設格式：類別、項目、金額 等欄位
+    let totalAssets = 0, totalLiab = 0;
+    const assetRows = [], liabRows = [];
+
+    rows.forEach(r => {
+      if (!r || !r[0]) return;
+      const cat = String(r[0] || '');
+      const name = String(r[1] || '');
+      const amt = Number(r[2]) || 0;
+      if (cat.includes('資產') || cat === '流動資產' || cat === '非流動資產' || cat === '投資資產') {
+        if (amt) { assetRows.push({ cat, name, amt }); totalAssets += amt; }
+      } else if (cat.includes('負債')) {
+        if (amt) { liabRows.push({ cat, name, amt }); totalLiab += amt; }
+      }
+    });
+
+    const netWorth = totalAssets - totalLiab;
+
+    document.getElementById('assets-cards').innerHTML = `
+      <div class="card">
+        <div class="card-label">總資產</div>
+        <div class="card-value">$${fmt(totalAssets)}</div>
+        <div class="card-sub">TWD</div>
+      </div>
+      <div class="card">
+        <div class="card-label">總負債</div>
+        <div class="card-value negative">$${fmt(totalLiab)}</div>
+        <div class="card-sub">TWD</div>
+      </div>
+      <div class="card">
+        <div class="card-label">淨資產</div>
+        <div class="card-value ${colorClass(netWorth)} gold">$${fmt(netWorth)}</div>
+        <div class="card-sub">資產 − 負債</div>
+      </div>
+      <div class="card">
+        <div class="card-label">負債比率</div>
+        <div class="card-value">${totalAssets > 0 ? ((totalLiab/totalAssets)*100).toFixed(1) : 0}%</div>
+        <div class="card-sub">負債 ÷ 資產</div>
+      </div>
+    `;
+
+    // 資產負債表格
+    const tableHTML = `
+      <table class="data-table">
+        <thead>
+          <tr><th>類別</th><th>項目</th><th>金額（TWD）</th><th>佔比</th></tr>
+        </thead>
+        <tbody>
+          <tr class="group-header"><td colspan="4">▌ 資產</td></tr>
+          ${assetRows.map(r=>`
+            <tr>
+              <td><span class="tag">${r.cat}</span></td>
+              <td>${r.name}</td>
+              <td class="pos">$${fmt(r.amt)}</td>
+              <td class="muted">${((r.amt/totalAssets)*100).toFixed(1)}%</td>
+            </tr>
+          `).join('')}
+          <tr class="total-row">
+            <td colspan="2">資產合計</td>
+            <td class="pos">$${fmt(totalAssets)}</td>
+            <td>100%</td>
+          </tr>
+          <tr class="group-header"><td colspan="4">▌ 負債</td></tr>
+          ${liabRows.map(r=>`
+            <tr>
+              <td><span class="tag">${r.cat}</span></td>
+              <td>${r.name}</td>
+              <td class="neg">$${fmt(r.amt)}</td>
+              <td class="muted">${totalLiab>0?((r.amt/totalLiab)*100).toFixed(1):0}%</td>
+            </tr>
+          `).join('')}
+          <tr class="total-row">
+            <td colspan="2">負債合計</td>
+            <td class="neg">$${fmt(totalLiab)}</td>
+            <td>100%</td>
+          </tr>
+          <tr class="total-row" style="background:var(--ink);color:var(--paper);">
+            <td colspan="2" style="color:var(--paper);">💎 淨資產</td>
+            <td style="color:${netWorth>=0?'#7dcf9f':'#f0a090'};">$${fmt(netWorth)}</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+    document.getElementById('assets-table').innerHTML = tableHTML;
+    document.getElementById('assets-status').textContent = '最新資料';
+    document.getElementById('assets-update').textContent = `更新於 ${new Date().toLocaleTimeString('zh-TW')}`;
+    window._assetsLoaded = true;
+  } catch(e) {
+    document.getElementById('assets-cards').innerHTML = `<div class="error-msg">讀取失敗：${e.message}</div>`;
+    console.error(e);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// PAGE 3: 股票持倉
+// ══════════════════════════════════════════════════════════
+async function loadStocks() {
+  window._stocksLoaded = false;
+  try {
+    // 台股
+    const twTable = await fetchSheet(CONFIG.ASSET_ID, CONFIG.TW_STOCK_SHEET);
+    const twRows = tableToRows(twTable);
+    const twHeaders = getColHeaders(twTable);
+
+    // 美股
+    const usTable = await fetchSheet(CONFIG.ASSET_ID, CONFIG.US_STOCK_SHEET);
+    const usRows = tableToRows(usTable);
+    const usHeaders = getColHeaders(usTable);
+
+    // 台股摘要：找合計類行（類型=買，計算市值和損益）
+    // 欄位: 年 日期 類型 代號 股票名稱 股數 買入均價 買入成本 手續費 現金股利 現價 持股市值
+    const twBuyRows = twRows.filter(r => r && r[2] === '買');
+    let twTotalMkt = 0, twTotalCost = 0, twTotalDiv = 0;
+    twRows.forEach(r => {
+      if (!r) return;
+      if (r[2] === '買') { twTotalCost += Number(r[7])||0; twTotalMkt += Number(r[11])||0; }
+      if (r[2] === '配股') { twTotalDiv += Number(r[9])||0; }
+    });
+    const twPnl = twTotalMkt + twTotalDiv - twTotalCost;
+    const twRet = twTotalCost > 0 ? twPnl / twTotalCost : 0;
+
+    // 美股：欄位: 年 日期 類型 代號 公司 股數 均價USD 成本USD 匯率 成本TWD 現價 市值USD 市值TWD 損益TWD 報酬率
+    let usTotalMkt = 0, usTotalCost = 0;
+    usRows.filter(r=>r&&r[2]==='買').forEach(r => {
+      usTotalCost += Number(r[9])||0;
+      usTotalMkt += Number(r[12])||0;
+    });
+    const usPnl = usTotalMkt - usTotalCost;
+    const usRet = usTotalCost > 0 ? usPnl / usTotalCost : 0;
+
+    document.getElementById('stocks-cards').innerHTML = `
+      <div class="card">
+        <div class="card-label">台股市值</div>
+        <div class="card-value">$${fmt(twTotalMkt)}</div>
+        <div class="card-sub">成本 $${fmt(twTotalCost)}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">台股損益（含股利）</div>
+        <div class="card-value ${colorClass(twPnl)}">$${fmt(twPnl)}</div>
+        <div class="card-sub">${fmtPct(twRet)}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">美股市值（TWD）</div>
+        <div class="card-value">$${fmt(usTotalMkt)}</div>
+        <div class="card-sub">成本 $${fmt(usTotalCost)}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">美股損益（TWD）</div>
+        <div class="card-value ${colorClass(usPnl)}">$${fmt(usPnl)}</div>
+        <div class="card-sub">${fmtPct(usRet)}</div>
+      </div>
+    `;
+
+    // 台股明細表（買入行）
+    document.getElementById('tw-stocks-table').innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr><th>代號</th><th>名稱</th><th>類型</th><th>股數</th><th>買入均價</th><th>買入成本</th><th>現價</th><th>持股市值</th><th>損益</th><th>報酬率</th></tr>
+        </thead>
+        <tbody>
+          ${twRows.filter(r=>r&&r[3]).map(r=>{
+            const pnl = (Number(r[11])||0) - (Number(r[7])||0);
+            const ret = (Number(r[7])||0) > 0 ? pnl/(Number(r[7])||1) : 0;
+            const isDiv = r[2] === '配股';
+            return `<tr${isDiv?' style="background:var(--amber_lt,#fdf8e8);"':''}>
+              <td><strong>${r[3]||'—'}</strong></td>
+              <td>${r[4]||'—'}</td>
+              <td><span class="tag">${r[2]||'—'}</span></td>
+              <td>${fmt(r[5])}</td>
+              <td>${isDiv?'—':'$'+fmt(r[6],2)}</td>
+              <td>${isDiv?'—':'$'+fmt(r[7])}</td>
+              <td>${isDiv?'—':'$'+fmt(r[10],2)}</td>
+              <td>${isDiv?'—':'$'+fmt(r[11])}</td>
+              <td class="${colorClass(pnl)}">${isDiv?'股利 $'+fmt(r[9]):('$'+fmt(pnl))}</td>
+              <td class="${colorClass(ret)}">${isDiv?'—':fmtPct(ret)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+
+    // 美股明細表
+    document.getElementById('us-stocks-table').innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr><th>代號</th><th>公司</th><th>股數</th><th>均價USD</th><th>成本TWD</th><th>現價USD</th><th>市值USD</th><th>市值TWD</th><th>損益TWD</th><th>報酬率</th></tr>
+        </thead>
+        <tbody>
+          ${usRows.filter(r=>r&&r[3]).map(r=>{
+            const pnl = Number(r[13])||0;
+            const ret = Number(r[14])||0;
+            return `<tr>
+              <td><strong>${r[2]||'—'}</strong></td>
+              <td>${r[3]||'—'}</td>
+              <td>${fmt(r[5])}</td>
+              <td>$${fmt(r[6],2)}</td>
+              <td>$${fmt(r[9])}</td>
+              <td>$${fmt(r[10],2)}</td>
+              <td>$${fmt(r[11],2)}</td>
+              <td>$${fmt(r[12])}</td>
+              <td class="${colorClass(pnl)}">$${fmt(pnl)}</td>
+              <td class="${colorClass(ret)}">${fmtPct(ret)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+
+    document.getElementById('stocks-status').textContent = '最新資料';
+    document.getElementById('stocks-update').textContent = `更新於 ${new Date().toLocaleTimeString('zh-TW')}`;
+    window._stocksLoaded = true;
+  } catch(e) {
+    document.getElementById('stocks-cards').innerHTML = `<div class="error-msg">讀取失敗：${e.message}</div>`;
+    console.error(e);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// PAGE 4: 帳戶對帳
+// ══════════════════════════════════════════════════════════
+async function loadReconcile() {
+  window._reconLoaded = false;
+  const month = document.getElementById('recon-month').value;
+  const dateFrom = document.getElementById('recon-date-from').value;
+  const dateTo = document.getElementById('recon-date-to').value;
+  document.getElementById('recon-status').textContent = `${month}`;
+  document.getElementById('recon-table').innerHTML = '<div class="loading">讀取對帳資料...</div>';
+
+  try {
+    const table = await fetchSheet(CONFIG.LEDGER_ID, CONFIG.LEDGER_SHEET);
+    const rows = tableToRows(table);
+
+    // 欄位: A日期(0) B類型(1) C帳戶來源(2) D目標帳戶(3) E金額(4) F幣別(5) G交易匯率(6) H台幣換算(7) I主類(8) J子類(9) K備註(10) L對帳狀態(11) M年月(12)
+    const iDate=0, iType=1, iSrc=2, iDst=3, iTWD=7, iYM=12;
+
+    function calcAccount(acct, filterFn) {
+      const acctRows = rows.filter(r => r && filterFn(r));
+      const income = acctRows.filter(r=>r[iType]==='收入'&&r[iSrc]===acct).reduce((s,r)=>s+(Number(r[iTWD])||0),0);
+      const expense = acctRows.filter(r=>r[iType]==='支出'&&r[iSrc]===acct).reduce((s,r)=>s+(Number(r[iTWD])||0),0);
+      const transferIn = acctRows.filter(r=>r[iType]==='移轉'&&r[iDst]===acct).reduce((s,r)=>s+(Number(r[iTWD])||0),0);
+      const transferOut = acctRows.filter(r=>r[iType]==='移轉'&&r[iSrc]===acct).reduce((s,r)=>s+(Number(r[iTWD])||0),0);
+      return { income, expense, transferNet: transferIn - transferOut };
+    }
+
+    // 月份篩選
+    const monthFilter = r => r[iYM] && String(r[iYM]).startsWith(month);
+    // 自訂日期篩選（信用卡用）
+    const customFilter = r => {
+      if (!r[iDate]) return false;
+      const d = r[iDate] instanceof Date ? r[iDate] : new Date(r[iDate]);
+      const from = new Date(dateFrom), to = new Date(dateTo);
+      return d >= from && d <= to;
+    };
+
+    function buildAccountRows(accounts, filterFn) {
+      return accounts.map(acct => {
+        const d = calcAccount(acct, filterFn);
+        return { acct, ...d };
+      });
+    }
+
+    const bankData = buildAccountRows(ACCOUNTS_BANK, monthFilter);
+    const creditData = buildAccountRows(ACCOUNTS_CREDIT, customFilter);
+
+    const bankTotalEst = bankData.reduce((s,d)=>s+(d.income-d.expense+d.transferNet),0);
+    const creditTotalEst = creditData.reduce((s,d)=>s+(d.expense+d.transferNet),0);
+
+    function renderRow(d) {
+      const est = d.income - d.expense + d.transferNet;
+      return `
+        <tr>
+          <td><strong>${d.acct}</strong></td>
+          <td><input type="number" class="ctrl-input" style="width:110px;padding:4px 8px;font-size:12px;" placeholder="0" id="prev_${d.acct}"></td>
+          <td class="pos">${d.income ? '$'+fmt(d.income) : '—'}</td>
+          <td class="neg">${d.expense ? '$'+fmt(d.expense) : '—'}</td>
+          <td class="${colorClass(d.transferNet)}">${d.transferNet ? '$'+fmt(d.transferNet) : '—'}</td>
+          <td><strong id="est_${d.acct}">—</strong></td>
+          <td><input type="number" class="ctrl-input" style="width:110px;padding:4px 8px;font-size:12px;" placeholder="0" id="actual_${d.acct}" oninput="calcDiff('${d.acct}')"></td>
+          <td id="diff_${d.acct}" class="muted">—</td>
+          <td><span class="tag link">→ 資產負債表</span></td>
+        </tr>
+      `;
+    }
+
+    document.getElementById('recon-table').innerHTML = `
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">▌銀行 / 現金 / 電子錢包</span>
+          <span class="tag">月份：${month}</span>
+        </div>
+        <div class="section-body" style="padding:0;overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>帳戶</th>
+                <th>上月底餘額<br><span style="color:var(--accent)">手填</span></th>
+                <th>本月收入<br>自動</th>
+                <th>本月支出<br>自動</th>
+                <th>移轉淨額<br>自動</th>
+                <th>系統推算<br>期末餘額</th>
+                <th>實際餘額<br><span style="color:var(--accent)">手填</span></th>
+                <th>差異</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${bankData.map(renderRow).join('')}
+              <tr class="total-row">
+                <td>銀行合計（推算）</td>
+                <td></td><td></td><td></td><td></td>
+                <td><strong id="bank_total">—</strong></td>
+                <td></td><td></td><td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section" style="margin-top:20px;">
+        <div class="section-header">
+          <span class="section-title">▌信用卡負債</span>
+          <span class="tag">${dateFrom} ～ ${dateTo}</span>
+        </div>
+        <div class="section-body" style="padding:0;overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>信用卡</th>
+                <th>上月底餘額<br><span style="color:var(--accent)">手填</span></th>
+                <th>本期刷卡<br>自動</th>
+                <th>本期退款<br>自動</th>
+                <th>移轉（繳費）<br>自動</th>
+                <th>系統推算<br>期末負債</th>
+                <th>實際帳單<br><span style="color:var(--accent)">手填</span></th>
+                <th>差異</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${creditData.map(renderRow).join('')}
+              <tr class="total-row">
+                <td>信用卡負債合計</td>
+                <td></td><td></td><td></td><td></td>
+                <td><strong id="credit_total">—</strong></td>
+                <td></td><td></td><td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:12px;line-height:1.8;">
+        💡 使用方式：填入「上月底餘額」後，系統推算期末餘額 = 上月底 + 收入 − 支出 + 移轉淨額<br>
+        填入「實際餘額」後，差異欄自動顯示。差異 ≠ 0 代表有漏記，補正那幾筆即可。
+      </p>
+    `;
+
+    // 初始化推算邏輯
+    [...ACCOUNTS_BANK, ...ACCOUNTS_CREDIT].forEach(acct => {
+      const prevEl = document.getElementById(`prev_${acct}`);
+      if (prevEl) prevEl.addEventListener('input', () => calcEst(acct));
+    });
+
+    function calcEst(acct) {
+      const prev = Number(document.getElementById(`prev_${acct}`)?.value) || 0;
+      const data = [...bankData, ...creditData].find(d => d.acct === acct);
+      if (!data) return;
+      const est = prev + data.income - data.expense + data.transferNet;
+      const estEl = document.getElementById(`est_${acct}`);
+      if (estEl) {
+        estEl.textContent = '$' + fmt(est);
+        estEl.className = est >= 0 ? 'pos' : 'neg';
+        estEl.dataset.est = est;
+      }
+      calcDiff(acct);
+      // 更新合計
+      const bankEst = ACCOUNTS_BANK.reduce((s,a)=>{
+        const v = Number(document.getElementById(`est_${a}`)?.dataset?.est) || 0;
+        return s + v;
+      }, 0);
+      const bTot = document.getElementById('bank_total');
+      if (bTot) { bTot.textContent = '$'+fmt(bankEst); bTot.className = bankEst>=0?'pos':'neg'; }
+      const creditEst = ACCOUNTS_CREDIT.reduce((s,a)=>{
+        const v = Number(document.getElementById(`est_${a}`)?.dataset?.est) || 0;
+        return s + v;
+      }, 0);
+      const cTot = document.getElementById('credit_total');
+      if (cTot) { cTot.textContent = '$'+fmt(creditEst); cTot.className = 'neg'; }
+    }
+
+    window.calcDiff = function(acct) {
+      const est = Number(document.getElementById(`est_${acct}`)?.dataset?.est);
+      const actual = Number(document.getElementById(`actual_${acct}`)?.value) || 0;
+      const diffEl = document.getElementById(`diff_${acct}`);
+      if (!diffEl || isNaN(est)) return;
+      const diff = actual - est;
+      diffEl.textContent = diff === 0 ? '✓' : (diff > 0 ? '+' : '') + '$' + fmt(diff);
+      diffEl.className = diff === 0 ? 'pos' : 'neg';
+    };
+
+    document.getElementById('recon-status').textContent = month;
+    document.getElementById('recon-update').textContent = `更新於 ${new Date().toLocaleTimeString('zh-TW')}`;
+    window._reconLoaded = true;
+  } catch(e) {
+    document.getElementById('recon-table').innerHTML = `<div class="error-msg">讀取失敗：${e.message}</div>`;
+    console.error(e);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// 初始化
+// ══════════════════════════════════════════════════════════
+initMonthSelectors();
+loadOverview();
+</script>
+</body>
+</html>
